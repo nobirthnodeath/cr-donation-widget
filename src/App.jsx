@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import ImpactCarousel from './components/ImpactCarousel'
 import './App.css'
 
 const SPRING_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)'
@@ -29,11 +30,9 @@ function App() {
     }
   }, [])
 
-  const handleSheetClick = useCallback(() => {
-    if (widgetMode === 'reduced') {
-      setWidgetMode('engaged')
-    }
-  }, [widgetMode])
+  const handleSupport = useCallback(() => {
+    setWidgetMode('engaged')
+  }, [])
 
   const handleOverlayClick = useCallback(() => {
     if (widgetMode === 'engaged') {
@@ -243,7 +242,6 @@ function App() {
 
         {/* Bottom sheet */}
         <div
-          onClick={handleSheetClick}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           style={{
@@ -259,7 +257,6 @@ function App() {
               ? 'translateY(100%)'
               : `translateY(${SHEET_HEIGHTS.engaged - SHEET_HEIGHTS[widgetMode]}px)`,
             transition: `transform ${SPRING_DURATION} ${SPRING_EASING}`,
-            cursor: widgetMode === 'reduced' ? 'pointer' : 'default',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -277,22 +274,24 @@ function App() {
             }}
           />
 
-          {/* Placeholder content */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontFamily: '"Inter", sans-serif',
-              fontSize: 14,
-              color: '#999',
-            }}
-          >
-            {widgetMode === 'engaged'
-              ? 'Donation form will live here'
-              : 'Impact stories will live here'}
-          </div>
+          {/* Sheet content */}
+          {widgetMode === 'engaged' ? (
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontFamily: '"Inter", sans-serif',
+                fontSize: 14,
+                color: '#999',
+              }}
+            >
+              Donation form will live here
+            </div>
+          ) : (
+            <ImpactCarousel onSupport={handleSupport} />
+          )}
         </div>
       </div>
     </div>
