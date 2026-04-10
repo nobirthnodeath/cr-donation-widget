@@ -1,6 +1,62 @@
+import { useState, useRef, useCallback } from 'react'
 import './App.css'
 
+const SPRING_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)'
+const SPRING_DURATION = '420ms'
+const SCROLL_THRESHOLD = 0.3
+const SWIPE_THRESHOLD = 60
+
+const SHEET_HEIGHTS = {
+  hidden: 0,
+  reduced: 260,
+  engaged: 360,
+}
+
 function App() {
+  const [widgetMode, setWidgetMode] = useState('hidden')
+  const hasTriggeredRef = useRef(false)
+  const scrollContainerRef = useRef(null)
+  const touchStartYRef = useRef(null)
+
+  const handleScroll = useCallback(() => {
+    if (hasTriggeredRef.current) return
+    const el = scrollContainerRef.current
+    if (!el) return
+    const scrollPct = el.scrollTop / (el.scrollHeight - el.clientHeight)
+    if (scrollPct >= SCROLL_THRESHOLD) {
+      hasTriggeredRef.current = true
+      setWidgetMode('reduced')
+    }
+  }, [])
+
+  const handleSheetClick = useCallback(() => {
+    if (widgetMode === 'reduced') {
+      setWidgetMode('engaged')
+    }
+  }, [widgetMode])
+
+  const handleOverlayClick = useCallback(() => {
+    if (widgetMode === 'engaged') {
+      setWidgetMode('reduced')
+    }
+  }, [widgetMode])
+
+  const handleTouchStart = useCallback((e) => {
+    touchStartYRef.current = e.touches[0].clientY
+  }, [])
+
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartYRef.current === null) return
+    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current
+    touchStartYRef.current = null
+    if (widgetMode === 'engaged' && deltaY > SWIPE_THRESHOLD) {
+      setWidgetMode('reduced')
+    }
+  }, [widgetMode])
+
+  const isEngaged = widgetMode === 'engaged'
+  const isHidden = widgetMode === 'hidden'
+
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -40,7 +96,12 @@ function App() {
         </div>
 
         {/* Scrollable article content */}
-        <div className="overflow-y-auto" style={{ height: 'calc(100% - 52px)' }}>
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="overflow-y-auto"
+          style={{ height: 'calc(100% - 52px)' }}
+        >
           <article className="px-6 pt-6 pb-12" style={{ fontFamily: '"Inter", sans-serif' }}>
             {/* Category label */}
             <p
@@ -165,6 +226,73 @@ function App() {
               </p>
             </div>
           </article>
+        </div>
+
+        {/* Overlay — engaged state only */}
+        <div
+          onClick={handleOverlayClick}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            opacity: isEngaged ? 1 : 0,
+            pointerEvents: isEngaged ? 'auto' : 'none',
+            transition: `opacity ${SPRING_DURATION} ${SPRING_EASING}`,
+          }}
+        />
+
+        {/* Bottom sheet */}
+        <div
+          onClick={handleSheetClick}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: SHEET_HEIGHTS.engaged,
+            backgroundColor: '#fff',
+            borderRadius: '16px 16px 0 0',
+            boxShadow: '0 -2px 16px rgba(0,0,0,0.08)',
+            transform: isHidden
+              ? 'translateY(100%)'
+              : `translateY(${SHEET_HEIGHTS.engaged - SHEET_HEIGHTS[widgetMode]}px)`,
+            transition: `transform ${SPRING_DURATION} ${SPRING_EASING}`,
+            cursor: widgetMode === 'reduced' ? 'pointer' : 'default',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          {/* Drag handle */}
+          <div
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: '#D1D5DB',
+              marginTop: 10,
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Placeholder content */}
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: '"Inter", sans-serif',
+              fontSize: 14,
+              color: '#999',
+            }}
+          >
+            {widgetMode === 'engaged'
+              ? 'Donation form will live here'
+              : 'Impact stories will live here'}
+          </div>
         </div>
       </div>
     </div>
