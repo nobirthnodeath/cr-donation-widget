@@ -1,5 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import ImpactCarousel from './components/ImpactCarousel'
+import DonationForm from './components/DonationForm'
+import CheckoutOverlay from './components/CheckoutOverlay'
 import './App.css'
 
 const SPRING_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)'
@@ -15,6 +17,8 @@ const SHEET_HEIGHTS = {
 
 function App() {
   const [widgetMode, setWidgetMode] = useState('hidden')
+  const [checkoutVisible, setCheckoutVisible] = useState(false)
+  const [checkoutAmount, setCheckoutAmount] = useState(0)
   const hasTriggeredRef = useRef(false)
   const scrollContainerRef = useRef(null)
   const touchStartYRef = useRef(null)
@@ -32,6 +36,21 @@ function App() {
 
   const handleSupport = useCallback(() => {
     setWidgetMode('engaged')
+  }, [])
+
+  const handleContinue = useCallback((amount) => {
+    setCheckoutAmount(amount)
+    setCheckoutVisible(true)
+  }, [])
+
+  const handleCheckoutClose = useCallback(() => {
+    setCheckoutVisible(false)
+  }, [])
+
+  const handleCheckoutComplete = useCallback(() => {
+    setCheckoutVisible(false)
+    setWidgetMode('hidden')
+    hasTriggeredRef.current = false
   }, [])
 
   const handleOverlayClick = useCallback(() => {
@@ -276,23 +295,19 @@ function App() {
 
           {/* Sheet content */}
           {widgetMode === 'engaged' ? (
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: '"Inter", sans-serif',
-                fontSize: 14,
-                color: '#999',
-              }}
-            >
-              Donation form will live here
-            </div>
+            <DonationForm onContinue={handleContinue} />
           ) : (
             <ImpactCarousel onSupport={handleSupport} />
           )}
         </div>
+
+        {/* Checkout takeover */}
+        <CheckoutOverlay
+          amount={checkoutAmount}
+          visible={checkoutVisible}
+          onClose={handleCheckoutClose}
+          onComplete={handleCheckoutComplete}
+        />
       </div>
     </div>
   )
