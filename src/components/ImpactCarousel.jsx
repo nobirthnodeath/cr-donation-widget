@@ -84,7 +84,7 @@ export default function ImpactCarousel({ onSupport }) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
+        height: 246,
         overflow: 'hidden',
         fontFamily: '"Inter", sans-serif',
       }}
@@ -181,7 +181,11 @@ export default function ImpactCarousel({ onSupport }) {
                   fontWeight: 400,
                   lineHeight: 1.6,
                   color: '#4B5563',
-                  margin: '0 0 auto 0',
+                  margin: 0,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
                 }}
               >
                 {card.body}
