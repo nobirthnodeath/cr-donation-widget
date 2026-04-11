@@ -38,6 +38,11 @@ function App() {
     setWidgetMode('engaged')
   }, [])
 
+  const handleDismiss = useCallback(() => {
+    setWidgetMode('hidden')
+    hasTriggeredRef.current = true
+  }, [])
+
   const handleContinue = useCallback((amount) => {
     setCheckoutAmount(amount)
     setCheckoutVisible(true)
@@ -280,18 +285,48 @@ function App() {
             flexDirection: 'column',
           }}
         >
-          {/* Drag handle */}
+          {/* Handle row */}
           <div
             style={{
-              width: 36,
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: '#D1D5DB',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
               marginTop: 10,
               flexShrink: 0,
-              alignSelf: 'center',
             }}
-          />
+          >
+            {/* Drag handle */}
+            <div
+              style={{
+                width: 36,
+                height: 4,
+                borderRadius: 2,
+                backgroundColor: '#D1D5DB',
+              }}
+            />
+            {/* Dismiss button — reduced state only */}
+            {widgetMode === 'reduced' && (
+              <button
+                onClick={handleDismiss}
+                style={{
+                  position: 'absolute',
+                  right: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: 12,
+                  color: '#9CA3AF',
+                  cursor: 'pointer',
+                  padding: '4px 0',
+                  fontFamily: '"Inter", sans-serif',
+                }}
+              >
+                Not now
+              </button>
+            )}
+          </div>
 
           {/* Sheet content */}
           {widgetMode === 'engaged' ? (
