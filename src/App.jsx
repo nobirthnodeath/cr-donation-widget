@@ -278,7 +278,6 @@ function App() {
             transition: `transform ${SPRING_DURATION} ${SPRING_EASING}`,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
           }}
         >
           {/* Drag handle */}
@@ -290,6 +289,7 @@ function App() {
               backgroundColor: '#D1D5DB',
               marginTop: 10,
               flexShrink: 0,
+              alignSelf: 'center',
             }}
           />
 

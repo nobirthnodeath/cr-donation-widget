@@ -7,6 +7,7 @@ const CARDS = [
     body: 'Our engineers identified critical strap failures at forces well below federal safety thresholds — before a single injury was reported.',
     stat: '4.7M',
     label: 'products recalled',
+    imageLabel: 'Infant carrier test',
   },
   {
     eyebrow: 'Independent Testing',
@@ -14,6 +15,7 @@ const CARDS = [
     body: 'Lab analysis funded entirely by members revealed formaldehyde levels regulators consider unsafe for infants, in products marketed as chemical-free.',
     stat: '28',
     label: 'products flagged',
+    imageLabel: 'Lab analysis',
   },
   {
     eyebrow: 'Your Support',
@@ -21,6 +23,7 @@ const CARDS = [
     body: 'CR is entirely member and donor supported. Every test we run and every company we hold accountable exists because of people like you.',
     stat: '87',
     label: 'years independent',
+    imageLabel: 'CR independence',
   },
 ]
 
@@ -105,72 +108,109 @@ export default function ImpactCarousel({ onSupport }) {
               boxSizing: 'border-box',
               padding: '12px 16px 0 16px',
               display: 'flex',
-              flexDirection: 'column',
+              gap: 14,
             }}
           >
-            {/* Eyebrow */}
-            <p
+            {/* Placeholder image */}
+            <div
               style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: '#6B7280',
-                margin: '0 0 6px 0',
+                width: 72,
+                minWidth: 72,
+                height: 72,
+                borderRadius: 8,
+                backgroundColor: '#F3F4F6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
-              {card.eyebrow}
-            </p>
-
-            {/* Headline */}
-            <p
-              style={{
-                fontSize: 17,
-                fontWeight: 600,
-                lineHeight: 1.3,
-                color: '#111827',
-                margin: '0 0 6px 0',
-              }}
-            >
-              {card.headline}
-            </p>
-
-            {/* Body */}
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 400,
-                lineHeight: 1.6,
-                color: '#4B5563',
-                margin: '0 0 auto 0',
-              }}
-            >
-              {card.body}
-            </p>
-
-            {/* Stat block */}
-            <div style={{ marginTop: 8 }}>
-              <p
+              <span
                 style={{
-                  fontSize: 26,
-                  fontWeight: 700,
-                  color: '#111827',
-                  margin: 0,
-                  lineHeight: 1.1,
-                }}
-              >
-                {card.stat}
-              </p>
-              <p
-                style={{
-                  fontSize: 11,
-                  fontWeight: 400,
+                  fontSize: 9,
                   color: '#9CA3AF',
-                  margin: 0,
+                  textAlign: 'center',
+                  lineHeight: 1.3,
+                  padding: 4,
                 }}
               >
-                {card.label}
+                {card.imageLabel}
+              </span>
+            </div>
+
+            {/* Text content */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+              {/* Eyebrow */}
+              <p
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: '#6B7280',
+                  margin: '0 0 4px 0',
+                }}
+              >
+                {card.eyebrow}
               </p>
+
+              {/* Headline */}
+              <p
+                style={{
+                  fontSize: 17,
+                  fontWeight: 600,
+                  lineHeight: 1.3,
+                  color: '#111827',
+                  margin: '0 0 4px 0',
+                }}
+              >
+                {card.headline}
+              </p>
+
+              {/* Body */}
+              <p
+                style={{
+                  fontSize: 13,
+                  fontWeight: 400,
+                  lineHeight: 1.6,
+                  color: '#4B5563',
+                  margin: '0 0 auto 0',
+                }}
+              >
+                {card.body}
+              </p>
+
+              {/* Stat block */}
+              <div style={{ marginTop: 6 }}>
+                <p
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: '#111827',
+                    margin: 0,
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {card.stat}
+                </p>
+                <p
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 400,
+                    color: '#9CA3AF',
+                    margin: 0,
+                  }}
+                >
+                  {card.label}
+                </p>
+              </div>
             </div>
           </div>
         ))}
