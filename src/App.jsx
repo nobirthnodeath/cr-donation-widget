@@ -1,85 +1,7 @@
-import { useState, useRef, useCallback } from 'react'
-import ImpactCarousel from './components/ImpactCarousel'
-import DonationForm from './components/DonationForm'
-import CheckoutOverlay from './components/CheckoutOverlay'
+import DonationWidget from './components/DonationWidget'
 import './App.css'
 
-const SPRING_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)'
-const SPRING_DURATION = '420ms'
-const SCROLL_THRESHOLD = 0.3
-const SWIPE_THRESHOLD = 60
-
-const SHEET_HEIGHTS = {
-  hidden: 0,
-  reduced: 260,
-  engaged: 360,
-}
-
 function App() {
-  const [widgetMode, setWidgetMode] = useState('hidden')
-  const [checkoutVisible, setCheckoutVisible] = useState(false)
-  const [checkoutAmount, setCheckoutAmount] = useState(0)
-  const hasTriggeredRef = useRef(false)
-  const scrollContainerRef = useRef(null)
-  const touchStartYRef = useRef(null)
-
-  const handleScroll = useCallback(() => {
-    if (hasTriggeredRef.current) return
-    const el = scrollContainerRef.current
-    if (!el) return
-    const scrollPct = el.scrollTop / (el.scrollHeight - el.clientHeight)
-    if (scrollPct >= SCROLL_THRESHOLD) {
-      hasTriggeredRef.current = true
-      setWidgetMode('reduced')
-    }
-  }, [])
-
-  const handleSupport = useCallback(() => {
-    setWidgetMode('engaged')
-  }, [])
-
-  const handleDismiss = useCallback(() => {
-    setWidgetMode('hidden')
-    hasTriggeredRef.current = true
-  }, [])
-
-  const handleContinue = useCallback((amount) => {
-    setCheckoutAmount(amount)
-    setCheckoutVisible(true)
-  }, [])
-
-  const handleCheckoutClose = useCallback(() => {
-    setCheckoutVisible(false)
-  }, [])
-
-  const handleCheckoutComplete = useCallback(() => {
-    setCheckoutVisible(false)
-    setWidgetMode('hidden')
-    hasTriggeredRef.current = false
-  }, [])
-
-  const handleOverlayClick = useCallback(() => {
-    if (widgetMode === 'engaged') {
-      setWidgetMode('reduced')
-    }
-  }, [widgetMode])
-
-  const handleTouchStart = useCallback((e) => {
-    touchStartYRef.current = e.touches[0].clientY
-  }, [])
-
-  const handleTouchEnd = useCallback((e) => {
-    if (touchStartYRef.current === null) return
-    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current
-    touchStartYRef.current = null
-    if (widgetMode === 'engaged' && deltaY > SWIPE_THRESHOLD) {
-      setWidgetMode('reduced')
-    }
-  }, [widgetMode])
-
-  const isEngaged = widgetMode === 'engaged'
-  const isHidden = widgetMode === 'hidden'
-
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -120,8 +42,6 @@ function App() {
 
         {/* Scrollable article content */}
         <div
-          ref={scrollContainerRef}
-          onScroll={handleScroll}
           className="overflow-y-auto"
           style={{ height: 'calc(100% - 52px)' }}
         >
@@ -200,6 +120,11 @@ function App() {
                 under 72 hours, and the failure modes can be striking.
               </p>
 
+              {/* Inline donation widget */}
+              <div style={{ margin: '28px -8px' }}>
+                <DonationWidget />
+              </div>
+
               {/* Mid-article heading */}
               <h2
                 style={{
@@ -250,99 +175,6 @@ function App() {
             </div>
           </article>
         </div>
-
-        {/* Overlay — engaged state only */}
-        <div
-          onClick={handleOverlayClick}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            opacity: isEngaged ? 1 : 0,
-            pointerEvents: isEngaged ? 'auto' : 'none',
-            transition: `opacity ${SPRING_DURATION} ${SPRING_EASING}`,
-          }}
-        />
-
-        {/* Bottom sheet */}
-        <div
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: SHEET_HEIGHTS.engaged,
-            backgroundColor: '#fff',
-            borderRadius: '16px 16px 0 0',
-            boxShadow: '0 -2px 16px rgba(0,0,0,0.08)',
-            transform: isHidden
-              ? 'translateY(100%)'
-              : `translateY(${SHEET_HEIGHTS.engaged - SHEET_HEIGHTS[widgetMode]}px)`,
-            transition: `transform ${SPRING_DURATION} ${SPRING_EASING}`,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* Handle row */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              marginTop: 10,
-              flexShrink: 0,
-            }}
-          >
-            {/* Drag handle */}
-            <div
-              style={{
-                width: 36,
-                height: 4,
-                borderRadius: 2,
-                backgroundColor: '#D1D5DB',
-              }}
-            />
-            {/* Dismiss button — reduced state only */}
-            {widgetMode === 'reduced' && (
-              <button
-                onClick={handleDismiss}
-                style={{
-                  position: 'absolute',
-                  right: 16,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: 12,
-                  color: '#9CA3AF',
-                  cursor: 'pointer',
-                  padding: '4px 0',
-                  fontFamily: '"Inter", sans-serif',
-                }}
-              >
-                Not now
-              </button>
-            )}
-          </div>
-
-          {/* Sheet content */}
-          {widgetMode === 'engaged' ? (
-            <DonationForm onContinue={handleContinue} />
-          ) : (
-            <ImpactCarousel onSupport={handleSupport} />
-          )}
-        </div>
-
-        {/* Checkout takeover */}
-        <CheckoutOverlay
-          amount={checkoutAmount}
-          visible={checkoutVisible}
-          onClose={handleCheckoutClose}
-          onComplete={handleCheckoutComplete}
-        />
       </div>
     </div>
   )
